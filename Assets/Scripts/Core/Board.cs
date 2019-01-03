@@ -47,4 +47,115 @@ public class Board : MonoBehaviour {
             Debug.Log("Warning: Please assign emptySprite object");
         }
     }
+
+    bool isWithinBoard(int x, int y)
+    {
+        return (x >= 0 && x < m_width && y >= 0);
+    }
+
+    bool isOccupied(int x, int y, Shape shape)
+    {
+        return (m_grid[x, y] != null && m_grid[x,y].parent != shape.transform);
+    }
+
+    public bool isValidPosition(Shape shape)
+    {
+        foreach (Transform child in shape.transform)
+        {
+            Vector2 pos = Vectorf.Round(child.position);
+            
+            if(!isWithinBoard((int)pos.x, (int)pos.y) || isOccupied((int)pos.x, (int)pos.y, shape))
+            {
+                return false;
+            }
+
+
+        }
+
+        return true;
+    }
+
+    public void StoreShapeInGrid(Shape shape)
+    {
+        if (shape == null)
+        {
+            return;
+        }
+
+        foreach(Transform child in shape.transform)
+        {
+            Vector2 pos = Vectorf.Round(child.position);
+            m_grid[(int)pos.x, (int)pos.y] = child;
+        }
+    }
+
+    bool IsComplete(int rowIndex)
+    {
+        for (int column = 0; column < m_width; ++column)
+        {
+            if(m_grid[column, rowIndex] == null)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    void ClearRow(int rowIndex)
+    {
+        for (int column = 0; column < m_width; ++column)
+        {
+            if(m_grid[column, rowIndex] != null)
+            {
+                Destroy(m_grid[column, rowIndex].gameObject);
+            }
+            m_grid[column, rowIndex] = null;
+        }
+    }
+
+    void ShiftOneRowDown(int y)
+    {
+        for (int x = 0; x < m_width; ++x)
+        {
+            if(m_grid[x, y] != null)
+            {
+                m_grid[x, y - 1] = m_grid[x, y];
+                m_grid[x, y] = null;
+                m_grid[x, y - 1].position += new Vector3(0, -1, 0);
+            }
+        }
+    }
+
+    void ShiftRowsDown(int startY)
+    {
+        for (int i = startY; i < m_height; ++i)
+        {
+            ShiftOneRowDown(i);
+        }
+    }
+
+    public void ClearAllRows()
+    {
+        for (int y = 0; y < m_height; ++y)
+        {
+            if (IsComplete(y))
+            {
+                ClearRow(y);
+                ShiftRowsDown(y + 1);
+                y--;
+            }
+        }
+    }
+
+    public bool IsOverLimit(Shape shape)
+    {
+        foreach (Transform child in shape.transform)
+        {
+            if (child.transform.position.y >= (m_height - m_header - 1))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }
