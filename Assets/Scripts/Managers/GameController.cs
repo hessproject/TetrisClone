@@ -19,25 +19,27 @@ public class GameController : MonoBehaviour {
     float m_dropInterval = .9f;
     float m_timeToDrop;
 
+    //Key repeat rates
     [Range(0.02f, 1f)]
     public float m_keyRepeatRateLeftRight = .1f;
     float m_timeToNextKeyLeftRight;
-
     [Range(0.02f, 1f)]
     public float m_keyRepeatRateDown = .01f;
     float m_timeToNextKeyDown;
-
     [Range(0.02f, 1f)]
     public float m_keyRepeatRateRotate = .20f;
     float m_timeToNextKeyRotate;
 
     bool m_gameOver = false;
 
+    SoundManager m_soundManager;
+
     // Use this for initialization
     void Start () {
 
         m_gameBoard = GameObject.FindWithTag("Board").GetComponent<Board>();
         m_spawner = GameObject.FindWithTag("Spawner").GetComponent<Spawner>();
+        m_soundManager = GameObject.FindObjectOfType<SoundManager>();
 
         m_timeToNextKeyDown = Time.time + m_keyRepeatRateDown;
         m_timeToNextKeyLeftRight = Time.time + m_keyRepeatRateLeftRight;
@@ -46,6 +48,11 @@ public class GameController : MonoBehaviour {
         if (!m_gameBoard)
         {
             Debug.LogWarning("Warning: No game board defined");
+        }
+
+        if (!m_soundManager)
+        {
+            Debug.LogWarning("Warning: No SoundManager defined");
         }
 
         if (!m_spawner)
@@ -67,7 +74,16 @@ public class GameController : MonoBehaviour {
             m_gameOverPanel.SetActive(false);
         }
 	}
-	
+
+    void Update()
+    {
+        if (m_gameBoard == null || m_spawner == null || m_activeShape == null || m_soundManager == null || m_gameOver)
+        {
+            return;
+        }
+        PlayerInput();
+    }
+
     void PlayerInput()
     {
         if (Input.GetButton("MoveRight") && Time.time > m_timeToNextKeyLeftRight || Input.GetButtonDown("MoveRight"))
@@ -78,6 +94,11 @@ public class GameController : MonoBehaviour {
             if (!m_gameBoard.isValidPosition(m_activeShape))
             {
                 m_activeShape.MoveLeft();
+                PlaySound(m_soundManager.m_errorSound);
+            }
+            else
+            {
+                PlaySound(m_soundManager.m_moveSound, .5f);
             }
         }
         else if (Input.GetButton("MoveLeft") && Time.time > m_timeToNextKeyLeftRight || Input.GetButtonDown("MoveLeft"))
@@ -88,15 +109,26 @@ public class GameController : MonoBehaviour {
             if (!m_gameBoard.isValidPosition(m_activeShape))
             {
                 m_activeShape.MoveRight();
+                PlaySound(m_soundManager.m_errorSound);
+            }
+            else
+            {
+                PlaySound(m_soundManager.m_moveSound, .5f);
             }
         }
         else if (Input.GetButton("Rotate") && Time.time > m_timeToNextKeyRotate)
         {
             m_activeShape.RotateRight();
             m_timeToNextKeyRotate = Time.time + m_keyRepeatRateRotate;
+
             if (!m_gameBoard.isValidPosition(m_activeShape))
             {
                 m_activeShape.RotateLeft();
+                PlaySound(m_soundManager.m_errorSound);
+            } 
+            else
+            {
+                PlaySound(m_soundManager.m_moveSound, .5f);
             }
         }
         else if (Input.GetButton("MoveDown") && Time.time > m_timeToNextKeyDown || (Time.time > m_timeToDrop))
@@ -129,6 +161,9 @@ public class GameController : MonoBehaviour {
         {
             m_gameOverPanel.SetActive(true);
         }
+
+        PlaySound(m_soundManager.m_gameOverSound, 2);
+        PlaySound(m_soundManager.m_gameOverVocal);
     }
 
     private void LandShape()
@@ -138,11 +173,29 @@ public class GameController : MonoBehaviour {
         m_timeToNextKeyRotate = Time.time;
         m_timeToNextKeyLeftRight = Time.time;
 
+        //Physically land shape
         m_activeShape.MoveUp();
         m_gameBoard.StoreShapeInGrid(m_activeShape);
+
+        PlaySound(m_soundManager.m_dropSound, .5f);
+
+        //Clear rows and drop rest of board
+        m_gameBoard.ClearAllRows();
+
+        if(m_gameBoard.m_completedRows > 0)
+        {
+            PlaySound(m_soundManager.m_clearRowSound);
+
+            if(m_gameBoard.m_completedRows > 1)
+            {
+                AudioClip randomVocal = m_soundManager.GetRandomClip(m_soundManager.m_vocalSounds);
+                PlaySound(randomVocal);
+            }
+        }
+
+        //Create new shape
         m_activeShape = m_spawner.SpawnShape();
 
-        m_gameBoard.ClearAllRows();
     }
 
     public void Restart()
@@ -151,14 +204,12 @@ public class GameController : MonoBehaviour {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    // Update is called once per frame
-    void Update()
+    void PlaySound(AudioClip clip, float volMultipler = 1)
     {
-        if(m_gameBoard == null || m_spawner == null || m_activeShape == null || m_gameOver)
+        if (clip && m_soundManager.m_fxEnabled)
         {
-            return;
+            AudioSource.PlayClipAtPoint(clip, Camera.main.transform.position, Mathf.Clamp(m_soundManager.m_fxVolume * volMultipler, 0.05f, 1f));
         }
-        PlayerInput();
     }
 
 }
