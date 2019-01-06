@@ -38,6 +38,9 @@ public class GameController : MonoBehaviour {
     public IconToggle m_rotateIconToggle;
     bool m_clockwise = true;
 
+    public bool m_isPaused = false;
+    public GameObject m_pausePanel;
+
     // Use this for initialization
     void Start () {
 
@@ -73,9 +76,14 @@ public class GameController : MonoBehaviour {
             m_spawner.transform.position = Vectorf.Round(m_spawner.transform.position);
         }
 
+        //Make sure gameover and pause panels aren't showing at game start
         if (m_gameOverPanel)
         {
             m_gameOverPanel.SetActive(false);
+        }
+        if (m_pausePanel)
+        {
+            m_pausePanel.SetActive(false);
         }
 	}
 
@@ -155,8 +163,13 @@ public class GameController : MonoBehaviour {
             }
 
         }
-        else if (Input.GetButtonDown("ToggleRotate")) {
+        else if (Input.GetButtonDown("ToggleRotate"))
+        {
             ToggleRotateDirection();
+        }
+        else if (Input.GetButtonDown("Pause"))
+        {
+            TogglePause();
         }
     }
 
@@ -207,7 +220,7 @@ public class GameController : MonoBehaviour {
 
     public void Restart()
     {
-        Debug.Log("Restarted");
+        Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
@@ -225,6 +238,28 @@ public class GameController : MonoBehaviour {
         if (m_rotateIconToggle)
         {
             m_rotateIconToggle.ToggleIcon(m_clockwise);
+        }
+    }
+
+    public void TogglePause()
+    {
+        if (m_gameOver)
+        {
+            return;
+        }
+
+        m_isPaused = !m_isPaused;
+
+        if (m_pausePanel)
+        {
+            m_pausePanel.SetActive(m_isPaused);
+
+            if (m_soundManager)
+            {
+                m_soundManager.m_musicSource.volume = (m_isPaused) ? m_soundManager.m_musicVolume * 0.25f : m_soundManager.m_musicVolume;
+            }
+
+            Time.timeScale = (m_isPaused) ? 0 : 1;
         }
     }
 
