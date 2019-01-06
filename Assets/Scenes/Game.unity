@@ -1742,8 +1742,14 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 8e6afcfcba29249349c399c7826ebf58, type: 3}
   - {fileID: 8300000, guid: 771c70196026e41e3abd6f9f46b17225, type: 3}
   - {fileID: 8300000, guid: e227747a923da450c93c73bcd1a0965c, type: 3}
-  m_vocalSounds: []
+  m_vocalSounds:
+  - {fileID: 8300000, guid: 3ceac021a4ee34f8795b93fed21c2fc0, type: 3}
+  - {fileID: 8300000, guid: ec3bd0966878d4089ad1fcc798bc3358, type: 3}
+  - {fileID: 8300000, guid: e753dc3dea92f4b1c81255878103653f, type: 3}
+  - {fileID: 8300000, guid: 8b9eee15a25ac4457bc8de1db8deed46, type: 3}
   m_musicSource: {fileID: 611649226}
+  m_musicIconToggle: {fileID: 985128883}
+  m_fxIconToggle: {fileID: 1486293700}
 --- !u!1 &924424223
 GameObject:
   m_ObjectHideFlags: 0
@@ -2060,6 +2066,7 @@ GameObject:
   - component: {fileID: 985128880}
   - component: {fileID: 985128882}
   - component: {fileID: 985128881}
+  - component: {fileID: 985128883}
   m_Layer: 5
   m_Name: MusicIcon
   m_TagString: Untagged
@@ -2122,6 +2129,20 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 985128879}
   m_CullTransparentMesh: 0
+--- !u!114 &985128883
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 985128879}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fbb3b86066b86d4aa2d55b9c7cef39f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_iconTrue: {fileID: 21300000, guid: d0a58b2fe63f9384484db40d59084905, type: 3}
+  m_iconFalse: {fileID: 21300000, guid: 3d4c410745953ed48bff06408c045871, type: 3}
+  m_defaultIconState: 1
 --- !u!1 &988607995
 GameObject:
   m_ObjectHideFlags: 0
@@ -2931,6 +2952,7 @@ GameObject:
   - component: {fileID: 1486293697}
   - component: {fileID: 1486293699}
   - component: {fileID: 1486293698}
+  - component: {fileID: 1486293700}
   m_Layer: 5
   m_Name: FXIcon
   m_TagString: Untagged
@@ -2993,6 +3015,20 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1486293696}
   m_CullTransparentMesh: 0
+--- !u!114 &1486293700
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1486293696}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fbb3b86066b86d4aa2d55b9c7cef39f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_iconTrue: {fileID: 21300000, guid: cfa8819ff28bbf045a336598ff0c7af9, type: 3}
+  m_iconFalse: {fileID: 21300000, guid: f3e42d4f7a2518a4287690aa9922aa6e, type: 3}
+  m_defaultIconState: 1
 --- !u!1 &1506494751
 GameObject:
   m_ObjectHideFlags: 0
