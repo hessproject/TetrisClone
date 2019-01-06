@@ -6,6 +6,15 @@ public class Shape : MonoBehaviour {
 
     public bool m_canRotate = true;
 
+    // Use this for initialization
+    void Start () {
+	}
+	
+	// Update is called once per frame
+	void Update () {
+		
+	}
+
     private void Move(Vector3 moveDirection)
     {
         transform.position += moveDirection;
@@ -46,12 +55,15 @@ public class Shape : MonoBehaviour {
         }
     }
 
-    // Use this for initialization
-    void Start () {
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    public void Rotate(bool clockwise)
+    {
+        if (clockwise)
+        {
+            RotateRight();
+        }
+        else
+        {
+            RotateLeft();
+        }
+    }
 }

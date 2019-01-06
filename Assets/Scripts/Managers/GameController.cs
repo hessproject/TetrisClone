@@ -34,6 +34,10 @@ public class GameController : MonoBehaviour {
 
     SoundManager m_soundManager;
 
+    //Determine the direction that pieces rotate
+    public IconToggle m_rotateIconToggle;
+    bool m_clockwise = true;
+
     // Use this for initialization
     void Start () {
 
@@ -118,12 +122,12 @@ public class GameController : MonoBehaviour {
         }
         else if (Input.GetButton("Rotate") && Time.time > m_timeToNextKeyRotate)
         {
-            m_activeShape.RotateRight();
+            m_activeShape.Rotate(m_clockwise);
             m_timeToNextKeyRotate = Time.time + m_keyRepeatRateRotate;
 
             if (!m_gameBoard.isValidPosition(m_activeShape))
             {
-                m_activeShape.RotateLeft();
+                m_activeShape.Rotate(!m_clockwise);
                 PlaySound(m_soundManager.m_errorSound);
             } 
             else
@@ -150,6 +154,9 @@ public class GameController : MonoBehaviour {
                 }
             }
 
+        }
+        else if (Input.GetButtonDown("ToggleRotate")) {
+            ToggleRotateDirection();
         }
     }
 
@@ -209,6 +216,15 @@ public class GameController : MonoBehaviour {
         if (clip && m_soundManager.m_fxEnabled)
         {
             AudioSource.PlayClipAtPoint(clip, Camera.main.transform.position, Mathf.Clamp(m_soundManager.m_fxVolume * volMultipler, 0.05f, 1f));
+        }
+    }
+
+    public void ToggleRotateDirection()
+    {
+        m_clockwise = !m_clockwise;
+        if (m_rotateIconToggle)
+        {
+            m_rotateIconToggle.ToggleIcon(m_clockwise);
         }
     }
 
