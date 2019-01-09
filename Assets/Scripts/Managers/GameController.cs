@@ -14,6 +14,12 @@ public class GameController : MonoBehaviour {
     //Currently active shape (only one shape is in play at a time)
     Shape m_activeShape;
 
+    //Ghost shape at bottom of board
+    Ghost m_ghost;
+
+    //Shape holder
+    Holder m_holder;
+
     public GameObject m_gameOverPanel;
 
     float m_dropInterval = .9f;
@@ -22,7 +28,7 @@ public class GameController : MonoBehaviour {
 
     //Key repeat rates
     [Range(0.02f, 1f)]
-    public float m_keyRepeatRateLeftRight = .1f;
+    public float m_keyRepeatRateLeftRight = .125f;
     float m_timeToNextKeyLeftRight;
     [Range(0.02f, 1f)]
     public float m_keyRepeatRateDown = .01f;
@@ -51,6 +57,8 @@ public class GameController : MonoBehaviour {
         m_spawner = GameObject.FindWithTag("Spawner").GetComponent<Spawner>();
         m_soundManager = FindObjectOfType<SoundManager>();
         m_scoreManager = FindObjectOfType<ScoreManager>();
+        m_ghost = FindObjectOfType<Ghost>();
+        m_holder = FindObjectOfType<Holder>();
 
         m_timeToNextKeyDown = Time.time + m_keyRepeatRateDown;
         m_timeToNextKeyLeftRight = Time.time + m_keyRepeatRateLeftRight;
@@ -105,6 +113,14 @@ public class GameController : MonoBehaviour {
             return;
         }
         PlayerInput();
+    }
+
+    void LateUpdate()
+    {
+        if (m_ghost)
+        {
+            m_ghost.DrawGhost(m_activeShape, m_gameBoard);
+        }
     }
 
     void PlayerInput()
@@ -182,6 +198,10 @@ public class GameController : MonoBehaviour {
         {
             TogglePause();
         }
+        else if (Input.GetButtonDown("Hold"))
+        {
+            Hold();
+        }
     }
 
     private void GameOver()
@@ -232,6 +252,16 @@ public class GameController : MonoBehaviour {
             PlaySound(m_soundManager.m_clearRowSound);
         }
 
+        if (m_ghost)
+        {
+            m_ghost.Reset();
+        }
+
+        if (m_holder)
+        {
+            m_holder.m_canRelease = true;
+        }
+
         //Create new shape
         m_activeShape = m_spawner.SpawnShape();
 
@@ -280,6 +310,40 @@ public class GameController : MonoBehaviour {
 
             Time.timeScale = (m_isPaused) ? 0 : 1;
         }
+    }
+
+    public void Hold()
+    {
+        if (!m_holder)
+        {
+            return;
+        }
+
+        if (!m_holder.m_heldShape)
+        {
+            m_holder.Catch(m_activeShape);
+            m_activeShape = m_spawner.SpawnShape();
+            PlaySound(m_soundManager.m_holdSound);
+        }
+        else if (m_holder.m_canRelease)
+        {
+            Shape shapeToCatch = m_activeShape;
+            m_activeShape = m_holder.Release();
+            m_activeShape.transform.position = m_spawner.transform.position;
+            m_holder.Catch(shapeToCatch);
+            PlaySound(m_soundManager.m_holdSound);
+        }
+        else
+        {
+            PlaySound(m_soundManager.m_errorSound);
+            return;
+        }
+
+        if (m_ghost)
+        {
+            m_ghost.Reset();
+        }
+        
     }
 
 }

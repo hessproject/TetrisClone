@@ -22,6 +22,7 @@ public class SoundManager : MonoBehaviour {
     public AudioClip m_gameOverSound;
     public AudioClip m_gameOverVocal;
     public AudioClip m_levelUpVocal;
+    public AudioClip m_holdSound;
 
     //Sound arrays for random selection
     public AudioClip[] m_backgroundMusic;
