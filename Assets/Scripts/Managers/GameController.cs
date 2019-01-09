@@ -231,7 +231,7 @@ public class GameController : MonoBehaviour {
         PlaySound(m_soundManager.m_dropSound, .5f);
 
         //Clear rows and drop rest of board
-        m_gameBoard.ClearAllRows();
+        m_gameBoard.StartCoroutine("ClearAllRows");
 
         if(m_gameBoard.m_completedRows > 0)
         {

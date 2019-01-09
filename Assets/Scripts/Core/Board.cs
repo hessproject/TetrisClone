@@ -15,6 +15,8 @@ public class Board : MonoBehaviour {
 
     public int m_completedRows = 0;
 
+    public ParticlePlayer[] m_rowGlowFx = new ParticlePlayer[4];
+
     private void Awake()
     {
         m_grid = new Transform[m_width, m_height];
@@ -136,20 +138,33 @@ public class Board : MonoBehaviour {
         }
     }
 
-    public void ClearAllRows()
+    public IEnumerator ClearAllRows()
     {
         m_completedRows = 0;
+
 
         for (int y = 0; y < m_height; ++y)
         {
             if (IsComplete(y))
             {
+                ClearRowFX(m_completedRows, y);
                 m_completedRows++;
+            }
+        }
+
+        yield return new WaitForSeconds(0.5f);
+
+        for (int y = 0; y < m_height; ++y)
+        {
+            if (IsComplete(y))
+            {
                 ClearRow(y);
                 ShiftRowsDown(y + 1);
+                yield return new WaitForSeconds(0.1f);
                 y--;
             }
         }
+
     }
 
     public bool IsOverLimit(Shape shape)
@@ -162,5 +177,14 @@ public class Board : MonoBehaviour {
             }
         }
         return false;
+    }
+
+    void ClearRowFX(int index, int y)
+    {
+        if (m_rowGlowFx[index])
+        {
+            m_rowGlowFx[index].transform.position = new Vector3(0, y, -2);
+            m_rowGlowFx[index].Play();
+        }
     }
 }
